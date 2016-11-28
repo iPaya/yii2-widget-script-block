@@ -19,13 +19,14 @@ class ScriptBlock extends Block
 
     public $cssOptions = [];
 
-    public $jsPattern = '|^<script[^>]*>(?P<js_content>.+?)</script>$|is';
+    public $jsPattern = '/<(script.*?)>(?P<js_content>.+?)<(\/script.*?)>/si';
 
-    public $cssPattern = '|^<style[^>]*>(?P<css_content>.+?)</style>$|is';
+    public $cssPattern = '/<(style.*?)>(?P<css_content>.+?)<(\/style.*?)>/si';
 
     public function init()
     {
         parent::init();
+        ob_start();
     }
 
     /**
@@ -34,45 +35,46 @@ class ScriptBlock extends Block
      */
     public function run()
     {
-        $this->registerCssBlock();
-        $this->registerJsBlock();
+        $block = trim(ob_get_clean());
+        $this->registerCssBlock($block);
+        $this->registerJsBlock($block);
     }
 
     /**
+     * @param string $block
      * @throws \Exception
      */
-    public function registerJsBlock()
+    public function registerJsBlock($block)
     {
-        $block = ob_get_clean();
         if ($this->renderInPlace) {
             throw new \Exception("not support yet ! ");
         }
-        $block = trim($block);
+        if (preg_match_all($this->jsPattern, $block, $matches)) {
+            $jsContents = ArrayHelper::getValue($matches, 'js_content', []);
+            $pos = ArrayHelper::getValue($this->jsOptions, 'position');
+            $key = ArrayHelper::getValue($this->jsOptions, 'key');
 
-        if (preg_match($this->jsPattern, $block, $matches)) {
-            $block = $matches['js_content'];
+            foreach ($jsContents as $jsContent) {
+                $this->view->registerJs($jsContent, $pos, $key);
+            }
         }
-        $pos = ArrayHelper::getValue($this->jsOptions, 'position');
-        $key = ArrayHelper::getValue($this->jsOptions, 'key');
-
-        $this->view->registerJs($block, $pos, $key);
     }
 
     /**
+     * @param string $block
      * @throws \Exception
      */
-    public function registerCssBlock()
+    public function registerCssBlock($block)
     {
-        $block = ob_get_clean();
         if ($this->renderInPlace) {
             throw new \Exception("not support yet ! ");
         }
-        $block = trim($block);
-        if (preg_match($this->cssPattern, $block, $matches)) {
-            $block = $matches['css_content'];
+        if (preg_match_all($this->cssPattern, $block, $matches)) {
+            $cssContents = ArrayHelper::getValue($matches, 'css_content', []);
+            foreach ($cssContents as $cssContent) {
+                $key = ArrayHelper::getValue($this->cssOptions, 'key');
+                $this->view->registerCss($cssContent, $this->cssOptions, $key);
+            }
         }
-        $key = ArrayHelper::getValue($this->cssOptions, 'key');
-
-        $this->view->registerCss($block, $this->cssOptions, $key);
     }
 }
