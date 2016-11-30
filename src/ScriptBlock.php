@@ -23,12 +23,6 @@ class ScriptBlock extends Block
 
     public $cssPattern = '/<(style.*?)>(?P<css_content>.+?)<(\/style.*?)>/si';
 
-    public function init()
-    {
-        parent::init();
-        ob_start();
-    }
-
     /**
      * Ends recording a block.
      * This method stops output buffering and saves the rendering result as a named block in the view.
