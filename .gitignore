@@ -1,7 +1,6 @@
 vendor/
-
+vagrant/
 .vagrant/
-
-.idea/workspace.xml
-
+Vagrantfile
+.idea/
 composer.lock

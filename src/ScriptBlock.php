@@ -5,7 +5,7 @@
  * @license http://ipaya.cn/license/
  */
 
-namespace iPaya\widgets\scriptblock;
+namespace iPaya\widgets\scriptBlock;
 
 use yii\helpers\ArrayHelper;
 use yii\web\View;

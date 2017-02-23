@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "iPaya\\widgets\\scriptblock\\": "src"
+            "iPaya\\widgets\\scriptBlock\\": "src"
         }
     },
     "extra": {
